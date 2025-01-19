@@ -5,7 +5,11 @@
 </head>
 <body>
 <h1>Sign In</h1>
-<p>Facial recognition coming soon!</p>
+<form action="/authenticate" method="post">
+    <label for="username">Username:</label>
+    <input type="text" id="username" name="username" required>
+    <button type="submit">Sign In</button>
+</form>
 <button onclick="location.href='/'">Back to Home</button>
 </body>
 </html>

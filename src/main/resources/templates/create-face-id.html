@@ -5,7 +5,11 @@
 </head>
 <body>
 <h1>Create Face ID</h1>
-<p>Facial recognition setup coming soon!</p>
+<form action="/save-face-id" method="post" enctype="multipart/form-data">
+    <label for="faceImage">Upload your face image:</label>
+    <input type="file" id="faceImage" name="faceImage" accept="image/*">
+    <button type="submit">Submit</button>
+</form>
 <button onclick="location.href='/'">Back to Home</button>
 </body>
 </html>
