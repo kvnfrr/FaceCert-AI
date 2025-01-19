@@ -1,15 +1,77 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
+    <meta charset="UTF-8">
     <title>Save Face ID</title>
 </head>
 <body>
 <h1>Save Face ID</h1>
 
-<!-- Display the success/error message -->
-<div th:if="${message}" th:text="${message}"></div>
+<form id="uploadForm" method="post" enctype="multipart/form-data" th:action="@{/save-face-id}">
+    <label for="faceImage">Upload Face Image:</label>
+    <input type="file" id="faceImage" name="faceImage" accept="image/png, image/jpeg" required />
+    <button type="submit">Upload</button>
+</form>
 
-<!-- Provide an option to upload another file -->
-<a th:href="@{/create-face-id}">Upload another file</a>
+<div id="message" th:text="${message}"></div>
+
+<script>
+    const form = document.getElementById("uploadForm");
+
+    form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const formData = new FormData(form);
+        const response = await fetch(form.action, {
+            method: "POST",
+            body: formData,
+        });
+
+        const responseText = await response.text();
+        document.body.innerHTML = responseText;
+
+        // Extract feature data from the server's response
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(responseText, "text/html");
+        const featureData = doc.querySelector("[th\\:text='${response.features}']")?.innerText;
+
+        if (featureData) {
+            saveToIndexedDB(featureData);
+            alert("Face ID features saved locally!");
+        } else {
+            alert("Error processing face image!");
+        }
+    });
+
+    function saveToIndexedDB(data) {
+        const dbName = "FaceCertAI";
+        const storeName = "faceFeatures";
+
+        const request = indexedDB.open(dbName, 1);
+
+        request.onupgradeneeded = function () {
+            const db = request.result;
+            if (!db.objectStoreNames.contains(storeName)) {
+                db.createObjectStore(storeName, { keyPath: "id", autoIncrement: true });
+            }
+        };
+
+        request.onsuccess = function () {
+            const db = request.result;
+            const transaction = db.transaction(storeName, "readwrite");
+            const store = transaction.objectStore(storeName);
+
+            store.add({ features: data, timestamp: new Date().toISOString() });
+
+            transaction.oncomplete = function () {
+                console.log("Face ID data saved locally.");
+            };
+        };
+
+        request.onerror = function (event) {
+            console.error("Error saving to IndexedDB:", event.target.errorCode);
+        };
+    }
+</script>
 </body>
 </html>

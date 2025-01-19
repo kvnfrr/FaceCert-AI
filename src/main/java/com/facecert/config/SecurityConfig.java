@@ -1,9 +1,7 @@
 package com.facecert.config;
 
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -21,13 +19,14 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/create-face-id", "/save-face-id", "/css/**", "/js/**").permitAll() // Publicly accessible
-                        .anyRequest().authenticated() // All other endpoints require authentication
+                        .requestMatchers("/static/**", "/css/**", "/js/**", "/images/**").permitAll() // Allow static resources
+                        .requestMatchers("/", "/login", "/create-face-id").permitAll() // Allow public pages
+                        .anyRequest().authenticated() // Secure other endpoints
                 )
                 .formLogin(login -> login
                         .loginPage("/login") // Custom login page
-                        .usernameParameter("u") // Map "u" to the username field
-                        .passwordParameter("p") // Map "p" to the password field
+                        .usernameParameter("u") // Map "u" to username field
+                        .passwordParameter("p") // Map "p" to password field
                         .permitAll()
                 )
                 .logout(logout -> logout
@@ -35,7 +34,7 @@ public class SecurityConfig {
                         .logoutSuccessUrl("/")
                         .permitAll()
                 )
-                .csrf(csrf -> csrf.disable()); // Disable CSRF for development simplicity
+                .csrf(csrf -> csrf.disable()); // Disable CSRF for simplicity during development
         return http.build();
     }
 

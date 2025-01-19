@@ -9,6 +9,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 @Controller
 public class WebController {
@@ -28,27 +30,42 @@ public class WebController {
         return "create-face-id"; // src/main/resources/templates/create-face-id.html
     }
 
+
     @PostMapping("/save-face-id")
     public String saveFaceId(@RequestParam("faceImage") MultipartFile faceImage, Model model) {
-        if (!faceImage.isEmpty()) {
-            try {
-                String uploadDir = System.getProperty("user.dir") + "/uploads";
-                File directory = new File(uploadDir);
-                if (!directory.exists()) {
-                    directory.mkdirs();
-                }
-
-                File destinationFile = new File(uploadDir, faceImage.getOriginalFilename());
-                faceImage.transferTo(destinationFile);
-
-                model.addAttribute("message", "File uploaded successfully: " + destinationFile.getAbsolutePath());
-            } catch (IOException e) {
-                model.addAttribute("message", "Failed to upload file: " + e.getMessage());
-            }
-        } else {
+        if (faceImage.isEmpty()) {
             model.addAttribute("message", "No file uploaded.");
+            return "save-face-id";
         }
-        return "save-face-id"; // Return the save-face-id template
+
+        String contentType = faceImage.getContentType();
+        if (!("image/png".equals(contentType) || "image/jpeg".equals(contentType))) {
+            model.addAttribute("message", "Invalid file type. Please upload a PNG or JPEG image.");
+            return "save-face-id";
+        }
+
+        try {
+            // Simulate facial feature extraction
+            String extractedFeatures = mockFeatureExtraction(faceImage);
+
+            // Return processed data to the client
+            Map<String, String> responseData = new HashMap<>();
+            responseData.put("status", "success");
+            responseData.put("features", extractedFeatures);
+            model.addAttribute("response", responseData);
+
+        } catch (Exception e) {
+            model.addAttribute("message", "An error occurred while processing the file.");
+            e.printStackTrace();
+            return "save-face-id";
+        }
+
+        return "save-face-id";
+    }
+
+    private String mockFeatureExtraction(MultipartFile file) {
+        // Mock AI feature extraction logic
+        return "mock_feature_vector_" + file.getOriginalFilename().hashCode();
     }
 
 }

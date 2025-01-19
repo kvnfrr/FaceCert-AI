@@ -1,15 +1,17 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Create Face ID</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FaceCert - Create Face ID</title>
+    <script src="/static/js/indexeddb.js" defer></script>
 </head>
 <body>
-<h1>Create Your Face ID</h1>
-<form action="/save-face-id" method="post" enctype="multipart/form-data">
-    <label for="faceImage">Upload Your Face Image:</label>
-    <input type="file" name="faceImage" id="faceImage" accept="image/*" required>
-    <button type="submit">Submit</button>
+<h1>Create Face ID</h1>
+<form id="face-upload-form">
+    <label for="faceImage">Upload Face Image:</label>
+    <input type="file" id="faceImage" name="faceImage" accept="image/*" required />
+    <button type="submit">Upload</button>
 </form>
 </body>
 </html>

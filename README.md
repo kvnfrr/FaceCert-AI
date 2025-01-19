@@ -10,6 +10,7 @@ To set up and run FaceCert AI, follow these steps:
 1. Install Java Development Kit (JDK) version 17 or higher.
 2. Ensure you have a build tool like Gradle installed and configured.
 3. Set up a Spring Boot development environment.
+4. The application uses IndexedDB, which is supported in most modern browsers (e.g., Chrome, Edge, Firefox, Safari).
 
 ### Steps to Clone and Run
 
@@ -36,11 +37,21 @@ To set up and run FaceCert AI, follow these steps:
 
 ## Usage
 
-1. Home Page: The main landing page of the application.
-2. Sign In Page: Allows users to log in with placeholder authentication.
-3. Create Face ID: Users can upload a facial image to set up their Face ID. Uploaded images are currently logged for development purposes.
+This project is currently in its initial stages. The application runs a basic Spring Boot setup for AI-driven facial recognition and now includes the following functionality:
 
-#### Planned Features
+- Create Face ID: Allows users to upload facial images. Uploaded data (e.g., file metadata and Base64-encoded content) is securely stored in the user's browser using IndexedDB, ensuring user privacy. 
+- Sign In: Placeholder functionality for authentication, to be expanded in future iterations.
+
+Note: All user data, including uploaded facial images, is stored locally on the user's device in the browser's IndexedDB. The server does not store any sensitive user information or images.
+
+#### How to Use
+
+1. Navigate to the Create Face ID page.
+2. Upload an image file (JPEG or PNG, max size 5MB).
+3. The uploaded file's metadata and content will be stored locally in the browser.
+4. Use the browser's developer tools (Application > IndexedDB) to inspect saved data if needed.
+
+## Planned Features
 - AI integration for facial recognition-based authentication.
 - Enhanced privacy and security features.
 - Additional user-friendly UI components.
