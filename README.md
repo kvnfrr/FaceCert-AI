@@ -36,16 +36,31 @@ To set up and run FaceCert AI, follow these steps:
 
 ## Usage
 
-This project is currently in its initial stages. The application runs a basic Spring Boot setup with placeholder functionality. Future updates will include:
-- "Create Face ID" functionality for users to register their faces.
-- "Sign In" functionality for users to authenticate via facial recognition.
+1. Home Page: The main landing page of the application.
+2. Sign In Page: Allows users to log in with placeholder authentication.
+3. Create Face ID: Users can upload a facial image to set up their Face ID. Uploaded images are currently logged for development purposes.
+
+#### Planned Features
+- AI integration for facial recognition-based authentication.
+- Enhanced privacy and security features.
+- Additional user-friendly UI components.
 
 ## Contributing
 
 Pull requests are welcome. For major changes, please open an issue first to discuss your proposal.
 
-Please ensure that contributions adhere to best practices for Java, Spring Boot, and Gradle development.
+- Ensure code follows Java, Spring Boot, and Gradle best practices.
+- Update the README and other relevant documentation when necessary.
+- Include unit tests where applicable.
+
+### Key Updates:
+1. **Added Current Features**: Detailed features implemented so far.
+2. **Planned Features**: Highlighted future functionality to clarify project goals.
+3. **Project Structure**: Brief overview of the directory structure.
+4. **Updated Prerequisites**: Clarified browser requirement and IDE recommendation.
+
 
 ## License
 
 [MIT](https://choosealicense.com/licenses/mit/)
+

@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>FaceCert AI</title>
 </head>
 <body>
 <h1>Welcome to FaceCert AI</h1>
-<button onclick="location.href='/signin'">Sign In</button>
-<button onclick="location.href='/create-face-id'">Create Face ID</button>
+<p><a th:href="@{/create-face-id}">Create Face ID</a></p>
+<p><a th:href="@{/login}">Sign In</a></p>
 </body>
 </html>

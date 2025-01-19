@@ -11,34 +11,28 @@ public class WebController {
 
     @GetMapping("/")
     public String home() {
-        return "index"; // Maps to src/main/resources/templates/index.html
+        return "index"; // src/main/resources/templates/index.html
     }
 
-    @GetMapping("/signin")
-    public String signIn() {
-        return "signin"; // Maps to src/main/resources/templates/signin.html
+    @GetMapping("/login")
+    public String login() {
+        return "login"; // src/main/resources/templates/login.html
     }
 
     @GetMapping("/create-face-id")
     public String createFaceId() {
-        return "create-face-id"; // Maps to src/main/resources/templates/create-face-id.html
+        return "create-face-id"; // src/main/resources/templates/create-face-id.html
     }
 
     @PostMapping("/save-face-id")
     public String saveFaceId(@RequestParam("faceImage") MultipartFile faceImage) {
-        // Placeholder logic: Print the file name for now
-        System.out.println("Received file: " + faceImage.getOriginalFilename());
-        return "redirect:/"; // Redirect back to home
-    }
-
-    @PostMapping("/authenticate")
-    public String authenticate(@RequestParam("username") String username) {
-        // Placeholder authentication logic
-        if (username.equalsIgnoreCase("testuser")) {
-            return "welcome"; // Redirect to a welcome page
+        if (!faceImage.isEmpty()) {
+            // Placeholder logic: Print the file name for now
+            System.out.println("Received file: " + faceImage.getOriginalFilename());
         } else {
-            return "redirect:/signin?error=true"; // Redirect back with an error
+            System.out.println("No file uploaded.");
         }
+        return "save-face-id"; // Return the save-face-id template
     }
 
 }
