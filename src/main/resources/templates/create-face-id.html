@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <meta charset="UTF-8">
     <title>Create Face ID</title>
 </head>
 <body>
-<h1>Create Face ID</h1>
-<form th:action="@{/save-face-id}" method="post" enctype="multipart/form-data">
-    <label for="faceImage">Upload your face image:</label>
-    <input type="file" id="faceImage" name="faceImage" accept="image/*" required>
+<h1>Create Your Face ID</h1>
+<form action="/save-face-id" method="post" enctype="multipart/form-data">
+    <label for="faceImage">Upload Your Face Image:</label>
+    <input type="file" name="faceImage" id="faceImage" accept="image/*" required>
     <button type="submit">Submit</button>
 </form>
 </body>

@@ -21,7 +21,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/create-face-id", "/css/**", "/js/**").permitAll() // Publicly accessible
+                        .requestMatchers("/", "/create-face-id", "/save-face-id", "/css/**", "/js/**").permitAll() // Publicly accessible
                         .anyRequest().authenticated() // All other endpoints require authentication
                 )
                 .formLogin(login -> login

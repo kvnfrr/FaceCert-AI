@@ -5,7 +5,11 @@
 </head>
 <body>
 <h1>Save Face ID</h1>
-<p>Your face ID has been successfully uploaded!</p>
-<a th:href="@{/}">Return to Home</a>
+
+<!-- Display the success/error message -->
+<div th:if="${message}" th:text="${message}"></div>
+
+<!-- Provide an option to upload another file -->
+<a th:href="@{/create-face-id}">Upload another file</a>
 </body>
 </html>
