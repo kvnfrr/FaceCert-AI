@@ -2,44 +2,95 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Sign In with Face ID</title>
-    <!-- Include Face API library -->
     <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.min.js"></script>
-    <!-- Include IndexedDB script -->
     <script src="/static/js/indexeddb.js" defer></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #1f2937, #3b82f6);
+            color: white;
+        }
+
+        .container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px 40px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        #camera {
+            border: 2px solid white;
+            border-radius: 10px;
+        }
+
+        .status {
+            margin-top: 15px;
+            font-size: 1rem;
+            font-weight: bold;
+        }
+
+        button {
+            margin-top: 15px;
+            padding: 10px 20px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: white;
+            color: #3b82f6;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #3b82f6;
+            color: white;
+        }
+
+        button:disabled {
+            background-color: grey;
+            color: white;
+            cursor: not-allowed;
+        }
+    </style>
 </head>
 <body>
-<h1>Sign In with Face ID</h1>
-<p>Align your face in the camera view to authenticate.</p>
-
-<!-- Video feed for camera -->
-<video id="camera" autoplay playsinline></video>
-
-<!-- Hidden canvas for capturing the frame -->
-<canvas id="canvas" style="display: none;"></canvas>
-
-<!-- Status Message -->
-<p id="status">Initializing face recognition...</p>
-<button id="retry" disabled>Retry</button>
+<div class="container">
+    <h1>Sign In with Face ID</h1>
+    <p>Align your face in the camera view to authenticate.</p>
+    <video id="camera" autoplay playsinline></video>
+    <canvas id="canvas" style="display: none;"></canvas>
+    <p id="status" class="status">Initializing face recognition...</p>
+</div>
 
 <script>
     const video = document.getElementById('camera');
     const canvas = document.getElementById('canvas');
     const status = document.getElementById('status');
-    const retryButton = document.getElementById('retry');
 
     let detectionInterval = null;
 
-    // Start the camera stream
     navigator.mediaDevices.getUserMedia({ video: true })
         .then(stream => {
             video.srcObject = stream;
         })
         .catch(err => {
             console.error("Camera access denied:", err);
-            alert("Camera access is required to authenticate.");
+            status.innerText = "Camera access is required to authenticate.";
         });
 
-    // Load face-api models
     Promise.all([
         faceapi.nets.ssdMobilenetv1.loadFromUri('/static/models'),
         faceapi.nets.faceLandmark68Net.loadFromUri('/static/models'),
@@ -48,12 +99,11 @@
         status.innerText = "Face recognition models loaded. Align your face to authenticate.";
     }).catch(err => {
         console.error("Error loading models:", err);
-        alert("Failed to load face recognition models. See console for details.");
+        status.innerText = "Failed to load face recognition models. See console for details.";
     });
 
-    // Perform face detection and descriptor extraction
     video.addEventListener('play', async () => {
-        if (detectionInterval) return; // Prevent multiple intervals
+        if (detectionInterval) return;
 
         const canvasContext = canvas.getContext('2d');
         canvas.width = video.videoWidth;
@@ -74,36 +124,28 @@
 
                     const detectedDescriptor = detections.descriptor;
 
-                    // Fetch registered descriptors from IndexedDB
                     fetchAllFromIndexedDB().then(storedData => {
                         if (storedData.length === 0) {
                             status.innerText = "No registered Face IDs found. Please create one first.";
-                            retryButton.disabled = false;
                             return;
                         }
 
-                        // Convert stored descriptors to Float32Array
                         const labeledDescriptors = storedData.map(data => {
                             const floatDescriptor = new Float32Array(data.content);
                             return new faceapi.LabeledFaceDescriptors(data.name, [floatDescriptor]);
                         });
 
-                        // Compare using FaceMatcher
                         const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors, 0.7); // Adjust threshold if necessary
                         const bestMatch = faceMatcher.findBestMatch(detectedDescriptor);
 
                         if (bestMatch.label !== "unknown") {
-                            alert(`Authentication successful! Welcome, ${bestMatch.label}.`);
-                            status.innerText = "Authentication successful.";
+                            window.location.href = "/signed-in";
                         } else {
-                            alert("Authentication failed. No match found.");
-                            status.innerText = "Authentication failed. Try again.";
+                            status.innerText = "Authentication failed. No match found.";
                         }
-                        retryButton.disabled = false;
                     }).catch(err => {
                         console.error("Error fetching stored descriptors:", err);
                         status.innerText = "Failed to fetch registered Face IDs. See console.";
-                        retryButton.disabled = false;
                     });
                 } else {
                     status.innerText = "No face detected. Please align your face properly and retry.";
@@ -111,16 +153,8 @@
             } catch (err) {
                 console.error("Error during face detection:", err);
                 status.innerText = "An error occurred during authentication. See console.";
-                retryButton.disabled = false;
             }
-        }, 1000); // Run face detection every second
-    });
-
-    // Retry button logic
-    retryButton.addEventListener('click', () => {
-        status.innerText = "Retrying face detection...";
-        detectionInterval = null; // Reset interval
-        retryButton.disabled = true;
+        }, 1000);
     });
 </script>
 </body>

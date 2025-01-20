@@ -14,14 +14,20 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/static/**", "/models/**", "/css/**", "/js/**").permitAll() // Allow static resources
-                        .requestMatchers("/", "/create-face-id", "/signin-face-id").permitAll() // Allow public pages
-                        .anyRequest().authenticated() // Secure other endpoints
+                        .requestMatchers("/static/**", "/css/**", "/js/**", "/images/**").permitAll()
+                        .requestMatchers("/", "/create-face-id", "/signin-face-id", "/signed-in").permitAll()
+                        .anyRequest().authenticated()
                 )
-                .csrf(csrf -> csrf.disable()) // Disable CSRF for simplicity
-                .headers(headers -> headers
-                        .frameOptions(frameOptions -> frameOptions.sameOrigin()) // Updated syntax
-                );
+                .formLogin(login -> login
+                        .loginPage("/")
+                        .permitAll()
+                )
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/")
+                        .permitAll()
+                )
+                .csrf(csrf -> csrf.disable());
         return http.build();
     }
 }

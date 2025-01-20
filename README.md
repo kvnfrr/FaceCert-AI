@@ -36,21 +36,38 @@ To set up and run FaceCert AI, follow these steps:
 
 ## Features
 
-### Create Face ID
-Users can create a Face ID by aligning their face in the camera feed. The application captures the face, extracts its unique features using `FaceAPI`, and securely stores the face descriptor in the user's browser using IndexedDB.
+### Landing Page
+- The landing page provides a user-friendly interface with two primary options: `Create Face ID` and `Sign In with Face ID`.
+- Features a professional design with a logo and streamlined navigation.
 
-Steps:
+### Create Face ID
+Users can create a Face ID by aligning their face in the camera feed. The application uses `FaceAPI` to capture the face, extract its unique features, and securely store the face descriptor in the user's browser using IndexedDB.
+
+#### Steps:
 1. Navigate to the "Create Face ID" page.
 2. Allow camera access.
-3. Align your face in the camera feed and let the system scan and save your Face ID.
+3. Align your face in the camera feed, and the system will scan and save your Face ID.
+4. Use the `Back` button to return to the home page after completing the process.
+
+Screenshot:
+![Create Face ID Page](src/main/resources/static/screenshots/create-face-id.png)
 
 ### Sign In with Face ID
-Users can authenticate themselves by aligning their face in the camera feed. The application matches the live face descriptor with previously stored descriptors using `FaceMatcher`.
+Users can authenticate themselves by aligning their face in the camera feed. The application matches the live face descriptor with previously stored descriptors using `FaceMatcher` for secure authentication.
 
-Steps:
+#### Steps:
 1. Navigate to the "Sign In with Face ID" page.
 2. Align your face in the camera feed.
-3. The application will authenticate you if a match is found.
+3. If a match is found, you will be redirected to a "Signed In" page.
+
+Screenshot:
+![Sign In Page](src/main/resources/static/screenshots/sign-in.png)
+
+### Signed-In Page
+After successful authentication, users are redirected to the "Signed In" page. This page displays a success message and provides a red `Sign Out` button for returning to the home page.
+
+Screenshot:
+![Signed-In Page](src/main/resources/static/screenshots/signed-in.png)
 
 ## Usage
 
@@ -60,17 +77,13 @@ This project now includes the following functionality:
 - **Sign In with Face ID:** Users can authenticate themselves using the previously saved Face ID.
 
 ### Key Features:
-- **Local Data Storage:** All facial data is stored locally using IndexedDB for enhanced privacy.
-- **AI-Powered:** Leverages `FaceAPI` for real-time facial recognition and landmark detection.
-- **Secure Matching:** Matches live facial data with stored descriptors using `FaceMatcher`.
+- **Spring Boot Integration:** Utilizes Spring Boot for seamless backend processing and routing.
+- **FaceAPI:** Powers real-time facial recognition, landmark detection, and descriptor extraction.
+- **IndexedDB Storage:** Ensures all facial data remains local to the user's browser for enhanced privacy.
+- **Secure Matching:** Implements `FaceMatcher` for robust face descriptor comparison and authentication.
+- **Improved User Interface:** Features responsive and visually appealing pages with consistent design across workflows.
 
-## Contributing
-
-Pull requests are welcome. For major changes, please open an issue first to discuss your proposal.
-
-Please ensure that contributions adhere to best practices for Java, Spring Boot, and Gradle development.
-
-### Changelog
+## Changelog
 
 #### v0.0.1 - Basic Setup
 - Initial Spring Boot setup.
@@ -110,6 +123,14 @@ Please ensure that contributions adhere to best practices for Java, Spring Boot,
 - Optimized UI for "Create Face ID" and "Sign In" workflows.
 - Enhanced privacy by ensuring all data remains local.
 
+#### v1.4.0 - Front-End Redesign and Finalization
+- Updated UI with consistent, modern styling across all pages.
+- Replaced pop-up messages with page redirects for smoother user experience.
+- Added "Back" button to the "Create Face ID" page.
+- Added "Signed In" page with a `Sign Out` button.
+- Fixed minor bugs and improved user flow.
+
 ## License
 
 [MIT](https://choosealicense.com/licenses/mit/)
+

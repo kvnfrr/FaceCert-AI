@@ -2,24 +2,91 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Create Face ID</title>
-    <!-- Include Face API library -->
     <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.min.js"></script>
-    <!-- Include IndexedDB script -->
     <script src="/static/js/indexeddb.js" defer></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #1f2937, #3b82f6);
+            color: white;
+        }
+
+        .container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px 40px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        #camera {
+            border: 2px solid white;
+            border-radius: 10px;
+        }
+
+        .status {
+            margin-top: 15px;
+            font-size: 1rem;
+            font-weight: bold;
+        }
+
+        button {
+            margin-top: 15px;
+            padding: 10px 20px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: white;
+            color: #3b82f6;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #3b82f6;
+            color: white;
+        }
+
+        button:disabled {
+            background-color: grey;
+            color: white;
+            cursor: not-allowed;
+        }
+
+        .back-button {
+            background-color: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+
+        .back-button:hover {
+            background-color: white;
+            color: #3b82f6;
+        }
+    </style>
 </head>
 <body>
-<h1>Create Your Face ID</h1>
-<p>Align your face in the camera view to register your Face ID.</p>
-
-<!-- Video feed for camera -->
-<video id="camera" autoplay playsinline></video>
-
-<!-- Hidden canvas for capturing the frame -->
-<canvas id="canvas" style="display: none;"></canvas>
-
-<!-- Status Message -->
-<p id="status">Initializing face recognition...</p>
-<button id="save-face-id" disabled>Save Face ID</button>
+<div class="container">
+    <h1>Create Your Face ID</h1>
+    <p>Align your face in the camera view to register your Face ID.</p>
+    <video id="camera" autoplay playsinline></video>
+    <canvas id="canvas" style="display: none;"></canvas>
+    <p id="status" class="status">Initializing face recognition...</p>
+    <button id="save-face-id" disabled>Save Face ID</button>
+    <button class="back-button" onclick="window.location.href='/'">Back</button>
+</div>
 
 <script>
     const video = document.getElementById('camera');
@@ -30,7 +97,6 @@
     let faceDescriptor = null;
     let detectionInterval = null;
 
-    // Start the camera stream
     navigator.mediaDevices.getUserMedia({ video: true })
         .then(stream => {
             video.srcObject = stream;
@@ -40,7 +106,6 @@
             alert("Camera access is required to register Face ID.");
         });
 
-    // Load face-api models
     Promise.all([
         faceapi.nets.ssdMobilenetv1.loadFromUri('/static/models'),
         faceapi.nets.faceLandmark68Net.loadFromUri('/static/models'),
@@ -52,9 +117,8 @@
         alert("Failed to load face recognition models. See console for details.");
     });
 
-    // Perform face detection and descriptor extraction
     video.addEventListener('play', async () => {
-        if (detectionInterval) return; // Prevent multiple intervals
+        if (detectionInterval) return;
 
         const canvasContext = canvas.getContext('2d');
         canvas.width = video.videoWidth;
@@ -71,11 +135,11 @@
 
                 if (detections.length > 0) {
                     clearInterval(detectionInterval);
-                    detectionInterval = null; // Reset the interval variable
+                    detectionInterval = null;
 
                     faceDescriptor = detections[0].descriptor;
 
-                    if (faceDescriptor.length === 128) { // Validate descriptor length
+                    if (faceDescriptor.length === 128) {
                         status.innerText = "Face captured successfully! Click 'Save Face ID' to store it.";
                         saveButton.disabled = false;
                     } else {
@@ -86,10 +150,9 @@
                 console.error("Error during face detection:", err);
                 status.innerText = "Face detection failed. Please ensure proper lighting and retry.";
             }
-        }, 1000); // Run face detection every second
+        }, 1000);
     });
 
-    // Save face descriptor to IndexedDB
     saveButton.addEventListener('click', () => {
         if (faceDescriptor) {
             const dataToSave = {
@@ -100,7 +163,6 @@
 
             try {
                 saveToIndexedDB(dataToSave);
-                alert("Face ID saved successfully!");
                 status.innerText = "Face ID saved. You can now use it to sign in.";
                 saveButton.innerText = "Face ID Saved!";
                 saveButton.disabled = true;

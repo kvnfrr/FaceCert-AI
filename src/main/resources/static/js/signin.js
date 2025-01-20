@@ -1,7 +1,6 @@
 async function recognizeFace(uploadedImage) {
     const img = await faceapi.bufferToImage(uploadedImage);
 
-    // Detect face and extract descriptor
     const detection = await faceapi.detectSingleFace(img)
         .withFaceLandmarks()
         .withFaceDescriptor();
@@ -13,8 +12,7 @@ async function recognizeFace(uploadedImage) {
 
     const uploadedDescriptor = detection.descriptor;
 
-    // Retrieve saved descriptors from IndexedDB
-    const savedDescriptors = await getFromIndexedDB(); // Implement this function
+    const savedDescriptors = await getFromIndexedDB();
     let bestMatch = null;
     let lowestDistance = Number.MAX_SAFE_INTEGER;
 
@@ -28,7 +26,7 @@ async function recognizeFace(uploadedImage) {
 
     console.log("Best match:", bestMatch, "Distance:", lowestDistance);
 
-    if (lowestDistance < 0.6) { // Threshold for face recognition
+    if (lowestDistance < 0.6) {
         alert(`Welcome back, ${bestMatch.metadata.name}!`);
         return true;
     } else {
@@ -37,7 +35,6 @@ async function recognizeFace(uploadedImage) {
     }
 }
 
-// Attach event listener to the sign-in form
 document.getElementById("signin-form").addEventListener("submit", async (event) => {
     event.preventDefault();
     const fileInput = document.getElementById("signinFaceImage");

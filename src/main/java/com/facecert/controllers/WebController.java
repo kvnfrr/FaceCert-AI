@@ -9,16 +9,21 @@ public class WebController {
 
     @GetMapping("/")
     public String home() {
-        return "index"; // src/main/resources/templates/index.html
+        return "index";
     }
 
     @GetMapping("/create-face-id")
     public String createFaceId() {
-        return "create-face-id"; // src/main/resources/templates/create-face-id.html
+        return "create-face-id";
     }
 
     @GetMapping("/signin-face-id")
     public String signinFaceId() {
-        return "signin-face-id"; // src/main/resources/templates/signin-face-id.html
+        return "signin-face-id";
+    }
+
+    @GetMapping("/signed-in")
+    public String success() {
+        return "signed-in";
     }
 }
