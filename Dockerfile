@@ -5,7 +5,7 @@ FROM openjdk:17-jdk-slim
 WORKDIR /app
 
 # Copy the build output JAR file to the container
-COPY build/libs/FaceCertAI-0.0.1-SNAPSHOT.jar app.jar
+COPY build/libs/facecert-ai-0.0.1-SNAPSHOT.jar app.jar
 
 # Expose the application port
 EXPOSE 8080
