@@ -35,7 +35,10 @@
         .then(stream => {
             video.srcObject = stream;
         })
-        .catch(err => console.error("Camera access denied:", err));
+        .catch(err => {
+            console.error("Camera access denied:", err);
+            alert("Camera access is required to register Face ID.");
+        });
 
     // Load face-api models
     Promise.all([
@@ -44,7 +47,10 @@
         faceapi.nets.faceRecognitionNet.loadFromUri('/static/models')
     ]).then(() => {
         status.innerText = "Face recognition models loaded. Align your face to start.";
-    }).catch(err => console.error("Error loading models:", err));
+    }).catch(err => {
+        console.error("Error loading models:", err);
+        alert("Failed to load face recognition models. See console for details.");
+    });
 
     // Perform face detection and descriptor extraction
     video.addEventListener('play', async () => {
@@ -57,18 +63,28 @@
         status.innerText = "Align your face. Scanning...";
 
         detectionInterval = setInterval(async () => {
-            const detections = await faceapi
-                .detectAllFaces(video, new faceapi.SsdMobilenetv1Options())
-                .withFaceLandmarks()
-                .withFaceDescriptors();
+            try {
+                const detections = await faceapi
+                    .detectAllFaces(video, new faceapi.SsdMobilenetv1Options())
+                    .withFaceLandmarks()
+                    .withFaceDescriptors();
 
-            if (detections.length > 0) {
-                clearInterval(detectionInterval);
-                detectionInterval = null; // Reset the interval variable
+                if (detections.length > 0) {
+                    clearInterval(detectionInterval);
+                    detectionInterval = null; // Reset the interval variable
 
-                faceDescriptor = detections[0].descriptor;
-                status.innerText = "Face captured successfully! Click 'Save Face ID' to store it.";
-                saveButton.disabled = false;
+                    faceDescriptor = detections[0].descriptor;
+
+                    if (faceDescriptor.length === 128) { // Validate descriptor length
+                        status.innerText = "Face captured successfully! Click 'Save Face ID' to store it.";
+                        saveButton.disabled = false;
+                    } else {
+                        throw new Error("Invalid face descriptor length. Ensure consistent model loading.");
+                    }
+                }
+            } catch (err) {
+                console.error("Error during face detection:", err);
+                status.innerText = "Face detection failed. Please ensure proper lighting and retry.";
             }
         }, 1000); // Run face detection every second
     });
@@ -92,6 +108,8 @@
                 console.error("Error saving Face ID:", err);
                 alert("Failed to save Face ID. See console for details.");
             }
+        } else {
+            alert("No valid face descriptor available to save. Please try again.");
         }
     });
 </script>

@@ -19,18 +19,25 @@
 
 <!-- Status Message -->
 <p id="status">Initializing face recognition...</p>
+<button id="retry" disabled>Retry</button>
 
 <script>
     const video = document.getElementById('camera');
     const canvas = document.getElementById('canvas');
     const status = document.getElementById('status');
+    const retryButton = document.getElementById('retry');
+
+    let detectionInterval = null;
 
     // Start the camera stream
     navigator.mediaDevices.getUserMedia({ video: true })
         .then(stream => {
             video.srcObject = stream;
         })
-        .catch(err => console.error("Camera access denied:", err));
+        .catch(err => {
+            console.error("Camera access denied:", err);
+            alert("Camera access is required to authenticate.");
+        });
 
     // Load face-api models
     Promise.all([
@@ -38,47 +45,82 @@
         faceapi.nets.faceLandmark68Net.loadFromUri('/static/models'),
         faceapi.nets.faceRecognitionNet.loadFromUri('/static/models')
     ]).then(() => {
-        status.innerText = "Face recognition models loaded. Align your face to start.";
-    }).catch(err => console.error("Error loading models:", err));
+        status.innerText = "Face recognition models loaded. Align your face to authenticate.";
+    }).catch(err => {
+        console.error("Error loading models:", err);
+        alert("Failed to load face recognition models. See console for details.");
+    });
 
-    // Perform face detection and descriptor matching
+    // Perform face detection and descriptor extraction
     video.addEventListener('play', async () => {
+        if (detectionInterval) return; // Prevent multiple intervals
+
         const canvasContext = canvas.getContext('2d');
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
 
-        status.innerText = "Align your face. Authenticating...";
+        status.innerText = "Align your face. Scanning...";
 
-        const interval = setInterval(async () => {
-            const detections = await faceapi
-                .detectAllFaces(video, new faceapi.SsdMobilenetv1Options())
-                .withFaceLandmarks()
-                .withFaceDescriptors();
+        detectionInterval = setInterval(async () => {
+            try {
+                const detections = await faceapi
+                    .detectSingleFace(video, new faceapi.SsdMobilenetv1Options())
+                    .withFaceLandmarks()
+                    .withFaceDescriptor();
 
-            if (detections.length > 0) {
-                clearInterval(interval);
+                if (detections) {
+                    clearInterval(detectionInterval);
+                    detectionInterval = null;
 
-                const detectedDescriptor = detections[0].descriptor;
+                    const detectedDescriptor = detections.descriptor;
 
-                // Fetch all stored face descriptors from IndexedDB
-                fetchAllFromIndexedDB((storedData) => {
-                    const labeledDescriptors = storedData.map((data) =>
-                        new faceapi.LabeledFaceDescriptors("User", [new Float32Array(data.content)])
-                    );
+                    // Fetch registered descriptors from IndexedDB
+                    fetchAllFromIndexedDB().then(storedData => {
+                        if (storedData.length === 0) {
+                            status.innerText = "No registered Face IDs found. Please create one first.";
+                            retryButton.disabled = false;
+                            return;
+                        }
 
-                    const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors);
-                    const bestMatch = faceMatcher.findBestMatch(detectedDescriptor);
+                        // Convert stored descriptors to Float32Array
+                        const labeledDescriptors = storedData.map(data => {
+                            const floatDescriptor = new Float32Array(data.content);
+                            return new faceapi.LabeledFaceDescriptors(data.name, [floatDescriptor]);
+                        });
 
-                    if (bestMatch.label === "User" && bestMatch.distance < 0.6) {
-                        status.innerText = "Authentication successful! Welcome.";
-                        alert("Authentication successful!");
-                    } else {
-                        status.innerText = "Authentication failed. No match found.";
-                        alert("Authentication failed. Please try again.");
-                    }
-                });
+                        // Compare using FaceMatcher
+                        const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors, 0.7); // Adjust threshold if necessary
+                        const bestMatch = faceMatcher.findBestMatch(detectedDescriptor);
+
+                        if (bestMatch.label !== "unknown") {
+                            alert(`Authentication successful! Welcome, ${bestMatch.label}.`);
+                            status.innerText = "Authentication successful.";
+                        } else {
+                            alert("Authentication failed. No match found.");
+                            status.innerText = "Authentication failed. Try again.";
+                        }
+                        retryButton.disabled = false;
+                    }).catch(err => {
+                        console.error("Error fetching stored descriptors:", err);
+                        status.innerText = "Failed to fetch registered Face IDs. See console.";
+                        retryButton.disabled = false;
+                    });
+                } else {
+                    status.innerText = "No face detected. Please align your face properly and retry.";
+                }
+            } catch (err) {
+                console.error("Error during face detection:", err);
+                status.innerText = "An error occurred during authentication. See console.";
+                retryButton.disabled = false;
             }
         }, 1000); // Run face detection every second
+    });
+
+    // Retry button logic
+    retryButton.addEventListener('click', () => {
+        status.innerText = "Retrying face detection...";
+        detectionInterval = null; // Reset interval
+        retryButton.disabled = true;
     });
 </script>
 </body>

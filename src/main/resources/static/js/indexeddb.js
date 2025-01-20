@@ -52,31 +52,26 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Fetch all data from IndexedDB
     const fetchAllFromIndexedDB = () => {
-        const db = openDB.result;
-        if (!db) {
-            console.error("Database is not available.");
-            return;
-        }
+        return new Promise((resolve, reject) => {
+            const db = openDB.result;
+            if (!db) {
+                reject("Database is not available.");
+                return;
+            }
 
-        const transaction = db.transaction(storeName, "readonly");
-        const store = transaction.objectStore(storeName);
+            const transaction = db.transaction(storeName, "readonly");
+            const store = transaction.objectStore(storeName);
 
-        const getAllRequest = store.getAll();
+            const getAllRequest = store.getAll();
 
-        getAllRequest.onsuccess = (event) => {
-            const storedData = event.target.result;
-            console.log("All stored data:", storedData);
+            getAllRequest.onsuccess = (event) => {
+                resolve(event.target.result);
+            };
 
-            storedData.forEach((data) => {
-                if (data.content) {
-                    console.log("Stored content:", data.content);
-                }
-            });
-        };
-
-        getAllRequest.onerror = (event) => {
-            console.error("Error fetching data:", event.target.error);
-        };
+            getAllRequest.onerror = (event) => {
+                reject(event.target.error);
+            };
+        });
     };
 
     // Attach functions to the window object to make them globally accessible
