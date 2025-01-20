@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const dbName = "FaceCertDB";
     const storeName = "FaceCertStore";
 
-    // Open the IndexedDB database
+    // Open or create the IndexedDB database
     const openDB = indexedDB.open(dbName, 1);
 
     openDB.onupgradeneeded = (event) => {
@@ -23,9 +23,14 @@ document.addEventListener("DOMContentLoaded", () => {
         console.error("Error opening database:", event.target.error);
     };
 
-    // Function to save data to IndexedDB
+    // Save data to IndexedDB
     const saveToIndexedDB = (data) => {
         const db = openDB.result;
+        if (!db) {
+            console.error("Database is not available.");
+            return;
+        }
+
         const transaction = db.transaction(storeName, "readwrite");
         const store = transaction.objectStore(storeName);
 
@@ -33,29 +38,40 @@ document.addEventListener("DOMContentLoaded", () => {
 
         request.onsuccess = () => {
             console.log("Data saved successfully:", data);
-            alert("File data saved successfully!");
         };
 
         request.onerror = (event) => {
             console.error("Error saving data:", event.target.error);
-            alert("Failed to save file data. See console for details.");
         };
 
         transaction.onerror = (event) => {
             console.error("Transaction error:", event.target.error);
         };
     };
+    window.saveToIndexedDB = saveToIndexedDB; // Expose globally
 
-    // Function to fetch and log all stored data
+    // Fetch all data from IndexedDB
     const fetchAllFromIndexedDB = () => {
         const db = openDB.result;
+        if (!db) {
+            console.error("Database is not available.");
+            return;
+        }
+
         const transaction = db.transaction(storeName, "readonly");
         const store = transaction.objectStore(storeName);
 
         const getAllRequest = store.getAll();
 
         getAllRequest.onsuccess = (event) => {
-            console.log("All stored data:", event.target.result);
+            const storedData = event.target.result;
+            console.log("All stored data:", storedData);
+
+            storedData.forEach((data) => {
+                if (data.content) {
+                    console.log("Stored content:", data.content);
+                }
+            });
         };
 
         getAllRequest.onerror = (event) => {
@@ -63,42 +79,6 @@ document.addEventListener("DOMContentLoaded", () => {
         };
     };
 
-    // Attach event listener to the form or upload button
-    const form = document.getElementById("face-upload-form"); // Ensure your form has this ID
-    if (form) {
-        form.addEventListener("submit", (event) => {
-            event.preventDefault();
-
-            // Extract file info
-            const fileInput = document.getElementById("faceImage"); // Ensure your file input has this ID
-            const file = fileInput.files[0];
-
-            if (!file) {
-                alert("No file selected.");
-                return;
-            }
-
-            // Use FileReader to read the file content
-            const reader = new FileReader();
-
-            reader.onload = () => {
-                const fileData = {
-                    name: file.name,
-                    size: file.size,
-                    type: file.type,
-                    content: reader.result, // Base64 string of the file
-                    date: new Date(),
-                };
-                saveToIndexedDB(fileData);
-                fetchAllFromIndexedDB(); // Debugging: Fetch all data after saving
-            };
-
-            reader.onerror = (error) => {
-                console.error("Error reading file:", error);
-                alert("Failed to read the file. See console for details.");
-            };
-
-            reader.readAsDataURL(file); // Converts file to Base64 string
-        });
-    }
+    // Attach functions to the window object to make them globally accessible
+    window.fetchAllFromIndexedDB = fetchAllFromIndexedDB;
 });

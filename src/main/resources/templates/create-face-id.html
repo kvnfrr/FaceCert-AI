@@ -1,17 +1,99 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FaceCert - Create Face ID</title>
+    <title>Create Face ID</title>
+    <!-- Include Face API library -->
+    <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.min.js"></script>
+    <!-- Include IndexedDB script -->
     <script src="/static/js/indexeddb.js" defer></script>
 </head>
 <body>
-<h1>Create Face ID</h1>
-<form id="face-upload-form">
-    <label for="faceImage">Upload Face Image:</label>
-    <input type="file" id="faceImage" name="faceImage" accept="image/*" required />
-    <button type="submit">Upload</button>
-</form>
+<h1>Create Your Face ID</h1>
+<p>Align your face in the camera view to register your Face ID.</p>
+
+<!-- Video feed for camera -->
+<video id="camera" autoplay playsinline></video>
+
+<!-- Hidden canvas for capturing the frame -->
+<canvas id="canvas" style="display: none;"></canvas>
+
+<!-- Status Message -->
+<p id="status">Initializing face recognition...</p>
+<button id="save-face-id" disabled>Save Face ID</button>
+
+<script>
+    const video = document.getElementById('camera');
+    const canvas = document.getElementById('canvas');
+    const status = document.getElementById('status');
+    const saveButton = document.getElementById('save-face-id');
+
+    let faceDescriptor = null;
+    let detectionInterval = null;
+
+    // Start the camera stream
+    navigator.mediaDevices.getUserMedia({ video: true })
+        .then(stream => {
+            video.srcObject = stream;
+        })
+        .catch(err => console.error("Camera access denied:", err));
+
+    // Load face-api models
+    Promise.all([
+        faceapi.nets.ssdMobilenetv1.loadFromUri('/static/models'),
+        faceapi.nets.faceLandmark68Net.loadFromUri('/static/models'),
+        faceapi.nets.faceRecognitionNet.loadFromUri('/static/models')
+    ]).then(() => {
+        status.innerText = "Face recognition models loaded. Align your face to start.";
+    }).catch(err => console.error("Error loading models:", err));
+
+    // Perform face detection and descriptor extraction
+    video.addEventListener('play', async () => {
+        if (detectionInterval) return; // Prevent multiple intervals
+
+        const canvasContext = canvas.getContext('2d');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+
+        status.innerText = "Align your face. Scanning...";
+
+        detectionInterval = setInterval(async () => {
+            const detections = await faceapi
+                .detectAllFaces(video, new faceapi.SsdMobilenetv1Options())
+                .withFaceLandmarks()
+                .withFaceDescriptors();
+
+            if (detections.length > 0) {
+                clearInterval(detectionInterval);
+                detectionInterval = null; // Reset the interval variable
+
+                faceDescriptor = detections[0].descriptor;
+                status.innerText = "Face captured successfully! Click 'Save Face ID' to store it.";
+                saveButton.disabled = false;
+            }
+        }, 1000); // Run face detection every second
+    });
+
+    // Save face descriptor to IndexedDB
+    saveButton.addEventListener('click', () => {
+        if (faceDescriptor) {
+            const dataToSave = {
+                name: `User-${Date.now()}`,
+                content: Array.from(faceDescriptor),
+                date: new Date()
+            };
+
+            try {
+                saveToIndexedDB(dataToSave);
+                alert("Face ID saved successfully!");
+                status.innerText = "Face ID saved. You can now use it to sign in.";
+                saveButton.innerText = "Face ID Saved!";
+                saveButton.disabled = true;
+            } catch (err) {
+                console.error("Error saving Face ID:", err);
+                alert("Failed to save Face ID. See console for details.");
+            }
+        }
+    });
+</script>
 </body>
 </html>
