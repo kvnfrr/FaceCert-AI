@@ -19,22 +19,28 @@
             text-align: center;
             background: white;
             border-radius: 10px;
-            padding: 50px 60px;
+            padding: 40px 60px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-            width: 600px;
+            width: 700px;
         }
 
         h1 {
-            font-size: 2.5rem;
-            margin-bottom: 30px;
+            font-size: 2rem;
+            margin-bottom: 15px;
             color: #1f2937;
+        }
+
+        .description {
+            font-size: 1rem;
+            margin-bottom: 30px;
+            color: #374151;
         }
 
         .button {
             display: inline-block;
-            padding: 15px 25px;
+            padding: 12px 25px;
             font-size: 1rem;
-            margin: 10px 10px;
+            margin: 10px 15px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
@@ -53,14 +59,14 @@
             color: #ef4444;
         }
 
-        .button.return-login {
-            background-color: #3b82f6;
+        .button.delete-data {
+            background-color: #dc2626;
             color: white;
         }
 
-        .button.return-login:hover {
+        .button.delete-data:hover {
             background-color: white;
-            color: #3b82f6;
+            color: #dc2626;
         }
 
         .logo-section {
@@ -86,12 +92,29 @@
 <body>
 <div class="container">
     <h1>You Have Successfully Signed In</h1>
+    <p class="description">Thank you for trying our FaceCertAI Face login demo. If you would like to try again or test without a saved Face ID, select "Sign Out and Delete Saved Data." Otherwise, click "Sign Out."</p>
     <button class="button sign-out" onclick="window.location.href='/'">Sign Out</button>
+    <button class="button delete-data" onclick="deleteDataAndSignOut()">Sign Out and Delete Saved Data</button>
 </div>
 
 <div class="logo-section">
     <img src="/static/images/logo.png" alt="FaceCert AI Logo">
     <span>FaceCertAI</span>
 </div>
+
+<script>
+    function deleteDataAndSignOut() {
+        // Clear IndexedDB
+        const request = indexedDB.deleteDatabase("FaceCertDB");
+        request.onsuccess = () => {
+            console.log("IndexedDB data deleted successfully.");
+            window.location.href = "/";
+        };
+        request.onerror = () => {
+            console.error("Error deleting IndexedDB data.");
+            alert("Failed to delete saved data. Please try again.");
+        };
+    }
+</script>
 </body>
 </html>
