@@ -12,53 +12,86 @@
             height: 100vh;
             background: linear-gradient(135deg, #1f2937, #3b82f6);
             color: white;
+            position: relative;
         }
 
         .container {
             text-align: center;
-            background: rgba(255, 255, 255, 0.1);
+            background: white;
             border-radius: 10px;
-            padding: 20px 40px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-        }
-
-        .logo {
-            width: 100px;
-            margin-bottom: 20px;
+            padding: 50px 60px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            width: 600px;
         }
 
         h1 {
-            font-size: 2rem;
-            margin-bottom: 20px;
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            color: #1f2937;
         }
 
         .button {
             display: inline-block;
-            padding: 10px 20px;
+            padding: 15px 25px;
             font-size: 1rem;
-            margin: 10px;
+            margin: 10px 10px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            background-color: #ef4444;
-            color: white;
-            border: 2px solid white;
             text-transform: uppercase;
             letter-spacing: 1px;
             transition: background-color 0.3s ease, color 0.3s ease;
         }
 
-        .button:hover {
+        .button.sign-out {
+            background-color: #ef4444;
+            color: white;
+        }
+
+        .button.sign-out:hover {
             background-color: white;
             color: #ef4444;
+        }
+
+        .button.return-login {
+            background-color: #3b82f6;
+            color: white;
+        }
+
+        .button.return-login:hover {
+            background-color: white;
+            color: #3b82f6;
+        }
+
+        .logo-section {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-section img {
+            width: 50px;
+            margin-right: 15px;
+        }
+
+        .logo-section span {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
 <div class="container">
-    <img src="/static/images/logo.png" alt="FaceCert AI Logo" class="logo">
     <h1>You Have Successfully Signed In</h1>
-    <button class="button" onclick="window.location.href='/'">Sign Out</button>
+    <button class="button sign-out" onclick="window.location.href='/'">Sign Out</button>
+</div>
+
+<div class="logo-section">
+    <img src="/static/images/logo.png" alt="FaceCert AI Logo">
+    <span>FaceCertAI</span>
 </div>
 </body>
 </html>

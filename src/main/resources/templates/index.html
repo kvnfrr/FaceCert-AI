@@ -7,46 +7,53 @@
             margin: 0;
             font-family: Arial, sans-serif;
             display: flex;
+            height: 100vh;
+        }
+
+        .left-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            background: linear-gradient(135deg, #1f2937, #3b82f6);
-            color: white;
+            padding: 20px;
+            background: white;
+            box-shadow: 2px 0px 5px rgba(0, 0, 0, 0.1);
         }
 
-        .container {
-            text-align: center;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            padding: 20px 40px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-        }
-
-        .logo {
-            width: 100px;
-            margin-top: 15px;
-        }
-
-        h1 {
+        .left-section h1 {
             font-size: 2rem;
+            color: #1f2937;
+            margin-bottom: 10px;
+        }
+
+        .form-group {
+            width: 100%;
+            max-width: 300px;
             margin-bottom: 20px;
+            text-align: center;
         }
 
-        .button-group {
-            margin-top: 20px;
-        }
-
-        .button {
-            display: inline-block;
-            padding: 10px 20px;
+        .form-group button {
+            width: 100%;
+            padding: 10px 15px;
             font-size: 1rem;
-            margin: 10px;
             border: none;
             border-radius: 5px;
+            margin-top: 10px;
             cursor: pointer;
             text-transform: uppercase;
             letter-spacing: 1px;
             transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .button.create {
+            background-color: #3b82f6;
+            color: white;
+        }
+
+        .button.create:hover {
+            background-color: #2563eb;
         }
 
         .button.sign-in {
@@ -60,26 +67,58 @@
             color: white;
         }
 
-        .button.create {
-            background-color: #3b82f6;
-            color: white;
-            border: 2px solid white;
+        .privacy-note {
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: #1f2937;
+            text-align: center;
+            max-width: 300px;
         }
 
-        .button.create:hover {
-            background-color: white;
-            color: #3b82f6;
+        .right-section {
+            flex: 1;
+            background: linear-gradient(135deg, #1f2937, #3b82f6);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .right-section img {
+            max-width: 150px;
+            margin-bottom: 20px;
+        }
+
+        .right-section h2 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        .right-section p {
+            font-size: 1rem;
+            line-height: 1.5;
+            max-width: 400px;
         }
     </style>
 </head>
 <body>
-<div class="container">
-    <img src="/static/images/logo.png" alt="FaceCert AI Logo" class="logo">
-    <h1>FaceCert AI</h1>
-    <div class="button-group">
+<div class="left-section">
+    <h1>Get Started Now</h1>
+    <div class="form-group">
         <button class="button create" onclick="window.location.href='/create-face-id'">Create Face ID</button>
-        <button class="button sign-in" onclick="window.location.href='/signin-face-id'">Sign In</button>
     </div>
+    <div class="form-group">
+        <button class="button sign-in" onclick="window.location.href='/signin-face-id'">Sign In with Face ID</button>
+    </div>
+    <p class="privacy-note">Your privacy matters: all facial data is stored locally on your device.</p>
+</div>
+<div class="right-section">
+    <img src="/static/images/logo.png" alt="FaceCert AI Logo">
+    <h2>Welcome to FaceCert AI</h2>
+    <p>FaceCert AI offers state-of-the-art facial recognition for secure and seamless authentication.</p>
 </div>
 </body>
 </html>

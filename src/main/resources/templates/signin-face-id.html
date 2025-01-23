@@ -14,55 +14,85 @@
             height: 100vh;
             background: linear-gradient(135deg, #1f2937, #3b82f6);
             color: white;
+            position: relative;
         }
 
         .container {
             text-align: center;
-            background: rgba(255, 255, 255, 0.1);
+            background: white;
             border-radius: 10px;
-            padding: 20px 40px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            padding: 40px 60px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            width: 600px;
         }
 
         h1 {
-            font-size: 2rem;
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            color: #1f2937;
+        }
+
+        p {
+            color: #1f2937;
+            font-size: 1rem;
             margin-bottom: 20px;
         }
 
         #camera {
-            border: 2px solid white;
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+            display: block;
+            border: 2px solid #3b82f6;
             border-radius: 10px;
         }
 
         .status {
-            margin-top: 15px;
+            margin-top: 20px;
             font-size: 1rem;
             font-weight: bold;
+            color: #1f2937;
         }
 
         button {
-            margin-top: 15px;
-            padding: 10px 20px;
+            margin-top: 20px;
+            padding: 15px 25px;
             font-size: 1rem;
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            background-color: white;
-            color: #3b82f6;
             text-transform: uppercase;
             letter-spacing: 1px;
             transition: background-color 0.3s ease, color 0.3s ease;
         }
 
-        button:hover {
+        .back-button {
             background-color: #3b82f6;
             color: white;
         }
 
-        button:disabled {
-            background-color: grey;
+        .back-button:hover {
+            background-color: white;
+            color: #3b82f6;
+        }
+
+        .logo-section {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-section img {
+            width: 50px;
+            margin-right: 15px;
+        }
+
+        .logo-section span {
             color: white;
-            cursor: not-allowed;
+            font-size: 1.5rem;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -73,6 +103,12 @@
     <video id="camera" autoplay playsinline></video>
     <canvas id="canvas" style="display: none;"></canvas>
     <p id="status" class="status">Initializing face recognition...</p>
+    <button class="back-button" onclick="window.location.href='/'">Return to Login</button>
+</div>
+
+<div class="logo-section">
+    <img src="/static/images/logo.png" alt="FaceCert AI Logo">
+    <span>FaceCertAI</span>
 </div>
 
 <script>
@@ -135,7 +171,7 @@
                             return new faceapi.LabeledFaceDescriptors(data.name, [floatDescriptor]);
                         });
 
-                        const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors, 0.7); // Adjust threshold if necessary
+                        const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors, 0.7);
                         const bestMatch = faceMatcher.findBestMatch(detectedDescriptor);
 
                         if (bestMatch.label !== "unknown") {

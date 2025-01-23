@@ -22,23 +22,25 @@ To set up and run FaceCert AI, follow these steps:
 2. Import the project into your preferred IDE or text editor.
 
 3. Build and run the project:
-    - Use Gradle to download dependencies and build the application:
-      ```bash
-      ./gradlew build
-      ```
-    - Run the application:
-      ```bash
-      ./gradlew bootRun
-      ```
+   - Use Gradle to download dependencies and build the application:
+     ```bash
+     ./gradlew build
+     ```
+   - Run the application:
+     ```bash
+     ./gradlew bootRun
+     ```
 
 4. Access the application:
-    - Open your browser and navigate to `http://localhost:8080`.
+   - Open your browser and navigate to `http://localhost:8080`.
 
 ## Features
 
 ### Landing Page
 - The landing page provides a user-friendly interface with two primary options: `Create Face ID` and `Sign In with Face ID`.
-- Features a professional design with a logo and streamlined navigation.
+
+Screenshot:
+![Landing Page](src/main/resources/static/screenshots/login.png)
 
 ### Create Face ID
 Users can create a Face ID by aligning their face in the camera feed. The application uses `FaceAPI` to capture the face, extract its unique features, and securely store the face descriptor in the user's browser using IndexedDB.
@@ -64,7 +66,7 @@ Screenshot:
 ![Sign In Page](src/main/resources/static/screenshots/sign-in.png)
 
 ### Signed-In Page
-After successful authentication, users are redirected to the "Signed In" page. This page displays a success message and provides a red `Sign Out` button for returning to the home page.
+After successful authentication, users are redirected to the "Signed In" page. This page displays a success message and provides two buttons: a red `Sign Out` button to return to the home page and a `Return to Login` button.
 
 Screenshot:
 ![Signed-In Page](src/main/resources/static/screenshots/signed-in.png)
@@ -127,7 +129,7 @@ This project now includes the following functionality:
 - Updated UI with consistent, modern styling across all pages.
 - Replaced pop-up messages with page redirects for smoother user experience.
 - Added "Back" button to the "Create Face ID" page.
-- Added "Signed In" page with a `Sign Out` button.
+- Added "Signed In" page with `Sign Out` and `Return to Login` buttons.
 - Fixed minor bugs and improved user flow.
 
 ## License
